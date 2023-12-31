@@ -6,7 +6,7 @@ dotenv.config();
 
 const logger = winston.createLogger({
   level: 'info',
-  format: winston.format.json(),
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
   transports: [
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
     new winston.transports.File({ filename: 'combined.log' }),
@@ -35,8 +35,6 @@ const hashPassword = async (plainTextPassword) => {
 const verifyPassword = async (plainTextPassword, salt, hashedPassword) => {
   try {
     const hashedPasswordToCompare = await bcrypt.hash(plainTextPassword, salt);
-    logger.log('hashedPasswordToCompare', hashedPasswordToCompare);
-    logger.log('hashedPassword', hashedPassword);
     return hashedPassword === hashedPasswordToCompare;
   } catch (error) {
     logger.error('Error verifying password:', error);

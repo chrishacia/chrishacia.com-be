@@ -33,8 +33,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const router = express.Router();
-router.use('/api/login', login);
-router.use('/api/domain-list', domainList);
+router.use('/api/login', require('./login'));
+router.use('/api/domain-list', require('./domain-list'));
+router.use('/api/message', require('./messages'));
 
 app.use(router);
 
