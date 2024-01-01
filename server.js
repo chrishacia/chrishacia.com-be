@@ -3,8 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const compression = require('compression');
-const login = require('./login');
-const domainList = require('./domain-list');
 
 dotenv.config();
 const app = express();
@@ -38,6 +36,16 @@ router.use('/api/domain-list', require('./domain-list'));
 router.use('/api/message', require('./messages'));
 
 app.use(router);
+
+
+// Serve static files from the Angular app
+app.use(express.static(path.join(__dirname, '/dist')));
+
+// Handle all GET requests
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, '/dist/index.html'));
+});
+
 
 app.listen(PORT, () => {
   if (process.env.SERVER_ENV !== 'production') {
