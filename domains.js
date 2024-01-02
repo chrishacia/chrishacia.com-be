@@ -19,12 +19,13 @@ function convertToMySQLDateTimeAndUTC(inputString) {
   return mysqlDatetime;
 }
 
-function parseCSV(csvText) {
+function parseCSVInsertString(csvText) {
 
   const sql = `INSERT INTO domains (userId,domain,insert_ts,create_ts,expire_ts,isActive,isParked,isForSale,isReserved) VALUES `;
 
   const rows = csvText.split('\n');
   const result = [];
+  const whitelist = [];
 
   for (const row of rows) {
     if (row.trim() === '') {
@@ -32,6 +33,7 @@ function parseCSV(csvText) {
     }
 
     const col = row.split(',');
+    whitelist.push(col[0]);
     result.push(
       `(1,'${col[0]}',DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'),'${convertToMySQLDateTimeAndUTC(col[3])}','${convertToMySQLDateTimeAndUTC(col[1])}',1,1,1,1)`
     );
@@ -40,8 +42,25 @@ function parseCSV(csvText) {
   return sql + result.join(',\n');
 }
 
+
+function parseCSVWhitelistString(csvText) {
+  const rows = csvText.split('\n');
+  const whitelist = [];
+
+  for (const row of rows) {
+    if (row.trim() === '') {
+      continue;
+    }
+
+    const col = row.split(',');
+    whitelist.push('http://' + col[0]);
+  }
+
+  return whitelist.join(',');
+}
+
 // Replace 'your-file.csv' with the path to your CSV file
-const filePath = 'accountDomainPrint-2023-10-29.csv';
+const filePath = 'accountDomainPrint-2024-1-1.csv';
 
 fs.readFile(filePath, 'utf8', (err, data) => {
   if (err) {
@@ -49,8 +68,28 @@ fs.readFile(filePath, 'utf8', (err, data) => {
     return;
   }
 
-  const parsedData = parseCSV(data);
-  console.log(parsedData);
+  console.log('File data:', data);
+
+  const parsedData = parseCSVInsertString(data);
+
+  console.log('File data:', data);
+  const parsedData2 = parseCSVWhitelistString(data);
+
+  fs.writeFile('insertDomain.txt', parsedData, (err) => {
+    if (err) {
+      console.error('Error writing the file:', err);
+      return;
+    }
+  });
+
+  fs.writeFile('whitelistDomain.txt', parsedData2, (err) => {
+    if (err) {
+      console.error('Error writing the file:', err);
+      return;
+    }
+  });
+
+  console.log('Files saved');
 });
 
 
