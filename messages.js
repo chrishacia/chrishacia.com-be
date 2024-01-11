@@ -31,14 +31,6 @@ module.exports = function messagesHandler(req, res) {
         return;
       }
 
-      if(message_type === 'offer') {
-        other = req.body.other;
-        if(!other) {
-          res.status(400).json({ data: [], error: 'OFFER_EMPTY' });
-          return;
-        }
-      }
-
       const data = {
         email,
         fullname: name,

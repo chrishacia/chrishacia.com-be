@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const router = express.Router();
 router.use('/api/login', require('./login'));
-router.use('/api/message', require('./messages'));
+router.use('/api/contact', require('./messages'));
 
 app.use(router);
 
