@@ -66,68 +66,6 @@ class Users {
   }
 }
 
-class Domains {
-  #db;
-  #table = 'domains';
-
-  constructor() {
-    this.#db = new Database();
-  }
-
-  async getDomains() {
-    try {
-      const sql = `
-        SELECT
-          id,
-          domain as name,
-          TIMESTAMPDIFF(YEAR, create_ts, NOW()) as age,
-          FORMAT(TIMESTAMPDIFF(DAY, NOW(), expire_ts), 0) as days_left,
-          DATE_FORMAT(create_ts, '%Y-%m-%d') as create_ts,
-          DATE_FORMAT(expire_ts, '%Y-%m-%d') as expire_ts,
-          DATE_FORMAT(insert_ts, '%Y-%m-%d') as insert_ts,
-          isParked,
-          isForSale,
-          isReserved,
-          SUBSTRING_INDEX( domain, '.', -1) as domain_tld,
-          LENGTH(SUBSTRING_INDEX( domain, '.', 1)) as domain_length
-        FROM ${this.#table} WHERE isActive = 1 ORDER BY domain ASC
-        `;
-      const domains = await this.#db.query(sql);
-
-      const tlds = await this.getDomainTLDs().then((tlds) => {
-        return tlds || [];
-      });
-
-      if (domains.length > 0) {
-        return {domains: domains, tlds: tlds};
-      }
-
-      return [];
-    } catch (err) {
-      logger.error(err);
-      throw err;
-    }
-  }
-
-  async getDomainTLDs() {
-    try {
-      const sql = `
-        SELECT
-        SUBSTRING_INDEX( domain, '.', -1) as tld
-        FROM ${this.#table} WHERE isActive = 1 GROUP BY tld ORDER BY tld ASC
-        `;
-      const results = await this.#db.query(sql);
-      if (results.length > 0) {
-        return results.map((r) => r.tld);
-      }
-      return [];
-    } catch (err) {
-      logger.error(err);
-      throw err;
-    }
-  }
-}
-
 class Messages {
   #db;
   #table = 'messages';
@@ -240,7 +178,6 @@ class Messages {
 }
 
 module.exports = {
-  Domains,
   Login,
   Messages,
   Users

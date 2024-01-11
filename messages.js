@@ -8,7 +8,6 @@ module.exports = function messagesHandler(req, res) {
   restful(req, res, {
     post: () => {
       const { email, message, message_type, name } = req.body;
-      const domain = req.body.domain ? req.body.domain : '';
       let other = '';
 
       if(!email) {
@@ -43,7 +42,7 @@ module.exports = function messagesHandler(req, res) {
       const data = {
         email,
         fullname: name,
-        message: domain ? `${domain}<br><br>----<br>${message}` : message,
+        message: message,
         message_type,
         other,
       };

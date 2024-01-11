@@ -5,6 +5,3 @@ node_modules/
 .env
 *.log
 dist
-domains.txt
-insertDomain.txt
-whitelistDomain.txt
